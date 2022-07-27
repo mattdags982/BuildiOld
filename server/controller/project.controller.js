@@ -51,7 +51,7 @@ const addBid = async (ctx) => {
       ctx.request.body._id,
       {
         $push: {
-          bids: { bidPrice: ctx.request.body.bid },
+          bids: { bidPrice: ctx.request.body.bidPrice },
         },
       },
       { new: true }
