@@ -5,11 +5,11 @@ const data = require("../model/project.model");
 //Should return the created project (need to add this)
 const postProject = async (ctx) => {
   try {
-    console.log(ctx.request.body);
     await data.Project.create({
       projectImage: ctx.request.file.path,
       name: ctx.request.body.name,
       description: ctx.request.body.description,
+      bids: [],
     });
     ctx.status = 202;
     ctx.body = "success!";
@@ -44,4 +44,24 @@ const returnOneProject = async (ctx) => {
   }
 };
 
-module.exports = { postProject, returnProjects, returnOneProject };
+const addBid = async (ctx) => {
+  try {
+    console.log(ctx.request.body);
+    ctx.body = await data.Project.findByIdAndUpdate(
+      ctx.request.body._id,
+      {
+        $push: {
+          bids: { bidPrice: ctx.request.body.bid },
+        },
+      },
+      { new: true }
+    );
+    ctx.status = 200;
+  } catch (e) {
+    ctx.status = 505;
+    ctx.body = e;
+    console.log(e);
+  }
+};
+
+module.exports = { postProject, returnProjects, returnOneProject, addBid };

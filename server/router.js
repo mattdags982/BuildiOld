@@ -15,15 +15,17 @@ const storage = multer.diskStorage({
 //note that I can use multer to filter by file types, only accept certain file sizes, etc.
 //creates a multer instance
 const upload = multer({ storage: storage });
-
+//create project
 router.post(
   "/create",
   upload.single("projectImage"),
   projectController.postProject
 );
-
+//add bid to a specific project
+router.post("/bid", projectController.addBid);
+//return all prjects
 router.get("/projects", projectController.returnProjects);
-
+//return specific project for details page
 router.get("/oneProject", projectController.returnOneProject);
 
 module.exports = router;
