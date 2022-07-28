@@ -114,8 +114,8 @@ const login = async (req, res) => {
 const profile = async (req, res) => {
   try {
     console.log("prof req user", req.user);
-    const { _id, firstName, lastName } = req.user;
-    const user = { _id, firstName, lastName };
+    const { _id, firstName, lastName, userType } = req.user;
+    const user = { _id, firstName, lastName, userType };
     res.status(200).send(user);
   } catch (error) {
     res.status(404).send({ error, message: "User not found" });
