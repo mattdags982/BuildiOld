@@ -22,7 +22,7 @@ const postProject = async (req, res) => {
 //Return lists of all projects
 const returnProjects = async (req, res) => {
   try {
-    console.log("returning all projects");
+    // console.log("returning all projects");
     const projects = await data.Project.find();
     return res.status(200).send(projects);
   } catch (e) {
@@ -78,12 +78,55 @@ const createUser = async (req, res) => {
       password: hash,
     });
     const user = await newUser.save();
-    // req.session.uid = user._id;
+    req.session.uid = user._id;
     console.log("user created!");
+    console.log(req.session.uid);
     res.status(201).send(user);
   } catch (e) {
     res.status(400).send({ error, message: "Could not create user" });
   }
+};
+
+const login = async (req, res) => {
+  try {
+    // console.log(req.body);
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    const validatedPass = await bcrypt.compare(password, user.password);
+    if (!validatedPass) throw new Error();
+    req.session.uid = user.id;
+    // console.log("logged in!");
+    console.log(req.session.uid);
+    res.status(200).send(user);
+  } catch (error) {
+    res
+      .status(401)
+      .send({ error: "401", message: "Username or password is incorrect" });
+  }
+};
+
+const profile = async (req, res) => {
+  try {
+    const { _id, firstName, lastName } = req.user;
+    const user = { _id, firstName, lastName };
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(404).send({ error, message: "User not found" });
+  }
+};
+
+const logout = (req, res) => {
+  console.log("entered logout controller function");
+  req.session.destroy((error) => {
+    if (error) {
+      res
+        .status(500)
+        .send({ error, message: "Could not log out, please try again" });
+    } else {
+      res.clearCookie("sid");
+      res.status(200).send({ message: "Logout successful" });
+    }
+  });
 };
 
 module.exports = {
@@ -92,4 +135,7 @@ module.exports = {
   returnOneProject,
   addBid,
   createUser,
+  login,
+  profile,
+  logout,
 };
