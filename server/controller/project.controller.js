@@ -4,92 +4,85 @@ const User = require("../model/user.model");
 const bcrypt = require("bcrypt");
 
 //Creates a new project
-//Should return the created project (need to add this)
-const postProject = async (ctx) => {
+const postProject = async (req, res) => {
   try {
     await data.Project.create({
-      projectImage: ctx.request.file.path,
-      name: ctx.request.body.name,
-      description: ctx.request.body.description,
+      projectImage: req.file.path,
+      name: req.body.name,
+      description: req.body.description,
       bids: [],
     });
-    ctx.status = 202;
-    ctx.body = "success!";
+    res.status(202);
+    res.send("success!");
   } catch (e) {
-    ctx.status = 504;
+    res.status(504);
     console.log(e);
   }
 };
-
 //Return lists of all projects
-const returnProjects = async (ctx) => {
+const returnProjects = async (req, res) => {
   try {
-    ctx.body = await data.Project.find();
     console.log("returning all projects");
-    ctx.status = 200;
+    const projects = await data.Project.find();
+    return res.status(200).send(projects);
   } catch (e) {
-    ctx.status = 505;
-    ctx.body = e;
     console.log(e);
+    res.status(505).send(e);
   }
 };
 
-const returnOneProject = async (ctx) => {
+const returnOneProject = async (req, res) => {
   try {
-    ctx.body = await data.Project.findById(ctx.request.query.id);
+    const project = await data.Project.findById(req.query.id);
     console.log("returning one project");
-    ctx.status = 200;
+    return res.status(200).send(project);
   } catch (e) {
-    ctx.status = 505;
-    ctx.body = e;
     console.log(e);
+    res.status(505).send(e);
   }
 };
 
-const addBid = async (ctx) => {
+const addBid = async (req, res) => {
   try {
-    console.log(ctx.request.body);
-    ctx.body = await data.Project.findByIdAndUpdate(
-      ctx.request.body._id,
+    console.log(req.body);
+    const projectToUpdate = await data.Project.findByIdAndUpdate(
+      req.body._id,
       {
         $push: {
-          bids: { bidPrice: ctx.request.body.bidPrice },
+          bids: { bidPrice: req.body.bidPrice },
         },
       },
       { new: true }
     );
-    ctx.status = 200;
+    res.status(200).send(projectToUpdate);
   } catch (e) {
-    ctx.status = 505;
-    ctx.body = e;
     console.log(e);
+    res.status(505).send(e);
   }
 };
 
-const createUser = async (ctx) => {
-  const { email, password } = ctx.request.body;
+const createUser = async (req, res) => {
+  const { email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (user) {
     console.log("user exists =(");
-    ctx.status = 409;
-    ctx.body = { error: "409", message: "User already exists" };
-    return;
+    return res
+      .status(409)
+      .send({ error: "409", message: "User already exists" });
   }
   try {
     if (password === "") throw new Error();
     const hash = await bcrypt.hash(password, 10);
     const newUser = new User({
-      ...ctx.request.body,
+      ...req.body,
       password: hash,
     });
     const user = await newUser.save();
-    ctx.cookies.set("uid", user_id, { httpOnly: false });
+    // req.session.uid = user._id;
     console.log("user created!");
-    ctx.status = 201;
-    ctx.body = user;
+    res.status(201).send(user);
   } catch (e) {
-    ctx.status = 400;
-    ctx.body = { error, message: "Could not create user" };
+    res.status(400).send({ error, message: "Could not create user" });
   }
 };
 

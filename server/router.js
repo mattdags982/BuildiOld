@@ -1,8 +1,14 @@
-const Router = require("@koa/router");
-const router = new Router();
+//CAHNGED
+// const Router = require("@koa/router");
+const router = require("express").Router();
+//REMOVE
+// const router = new Router();
 const projectController = require("./controller/project.controller");
-//,ulter is for incoming form data
-const multer = require("@koa/multer");
+//multer is for incoming form data
+//CHANGE
+// const multer = require("@koa/multer");
+const multer = require("multer");
+
 //configures how multer stores files. More detailed than just using dest
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
