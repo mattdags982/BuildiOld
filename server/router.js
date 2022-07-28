@@ -28,6 +28,6 @@ router.get("/projects", projectController.returnProjects);
 //return specific project for details page
 router.get("/oneProject", projectController.returnOneProject);
 
-router.get("/register", projectController.createUser);
+router.post("/register", projectController.createUser);
 
 module.exports = router;

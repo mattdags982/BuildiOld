@@ -1,5 +1,6 @@
 "use strict";
 const data = require("../model/project.model");
+const User = require("../model/user.model");
 const bcrypt = require("bcrypt");
 
 //Creates a new project
@@ -66,22 +67,24 @@ const addBid = async (ctx) => {
 };
 
 const createUser = async (ctx) => {
-  console.log("entered");
-  const { email, password } = ctx.body;
-  const user = await data.User.findOne({ email: email });
+  const { email, password } = ctx.request.body;
+  const user = await User.findOne({ email: email });
   if (user) {
+    console.log("user exists =(");
     ctx.status = 409;
     ctx.body = { error: "409", message: "User already exists" };
+    return;
   }
   try {
-    // if (password === "") throw new Error();
+    if (password === "") throw new Error();
     const hash = await bcrypt.hash(password, 10);
     const newUser = new User({
-      ...ctx.body,
+      ...ctx.request.body,
       password: hash,
     });
     const user = await newUser.save();
     ctx.cookies.set("uid", user_id, { httpOnly: false });
+    console.log("user created!");
     ctx.status = 201;
     ctx.body = user;
   } catch (e) {

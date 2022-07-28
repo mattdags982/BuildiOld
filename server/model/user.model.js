@@ -10,4 +10,4 @@ const userSchema = new Schema({
 });
 
 //this actually creates the table and names it 'project'
-module.exports.User = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);
