@@ -2,9 +2,10 @@ const mongoose = require("./index");
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
+const userSchema = mongoose.Schema({
   email: String,
   password: String,
+  userType: String,
   firstName: String,
   lastName: String,
 });

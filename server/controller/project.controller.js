@@ -10,6 +10,7 @@ const postProject = async (req, res) => {
       projectImage: req.file.path,
       name: req.body.name,
       description: req.body.description,
+      userId: req.body._id,
       bids: [],
     });
     res.status(202);
@@ -22,9 +23,20 @@ const postProject = async (req, res) => {
 //Return lists of all projects
 const returnProjects = async (req, res) => {
   try {
-    // console.log("returning all projects");
     const projects = await data.Project.find();
     return res.status(200).send(projects);
+  } catch (e) {
+    console.log(e);
+    res.status(505).send(e);
+  }
+};
+
+//Return list of projects specific to a user
+const returnProjectsById = async (req, res) => {
+  try {
+    console.log("param id:", req.query.id);
+    // const projects = await data.Project.find({ userId: req.user._id });
+    // return res.status(200).send(projects);
   } catch (e) {
     console.log(e);
     res.status(505).send(e);
@@ -34,7 +46,6 @@ const returnProjects = async (req, res) => {
 const returnOneProject = async (req, res) => {
   try {
     const project = await data.Project.findById(req.query.id);
-    console.log("returning one project");
     return res.status(200).send(project);
   } catch (e) {
     console.log(e);
@@ -44,7 +55,6 @@ const returnOneProject = async (req, res) => {
 
 const addBid = async (req, res) => {
   try {
-    console.log(req.body);
     const projectToUpdate = await data.Project.findByIdAndUpdate(
       req.body._id,
       {
@@ -79,8 +89,6 @@ const createUser = async (req, res) => {
     });
     const user = await newUser.save();
     req.session.uid = user._id;
-    console.log("user created!");
-    console.log(req.session.uid);
     res.status(201).send(user);
   } catch (e) {
     res.status(400).send({ error, message: "Could not create user" });
@@ -89,14 +97,12 @@ const createUser = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    // console.log(req.body);
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
     const validatedPass = await bcrypt.compare(password, user.password);
     if (!validatedPass) throw new Error();
     req.session.uid = user.id;
-    // console.log("logged in!");
-    console.log(req.session.uid);
+    console.log("logged in!");
     res.status(200).send(user);
   } catch (error) {
     res
@@ -107,6 +113,7 @@ const login = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
+    console.log("prof req user", req.user);
     const { _id, firstName, lastName } = req.user;
     const user = { _id, firstName, lastName };
     res.status(200).send(user);
@@ -132,6 +139,7 @@ const logout = (req, res) => {
 module.exports = {
   postProject,
   returnProjects,
+  returnProjectsById,
   returnOneProject,
   addBid,
   createUser,

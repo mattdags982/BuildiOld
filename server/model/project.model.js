@@ -9,6 +9,7 @@ const projectSchema = new Schema({
   projectImage: String,
   name: String,
   description: String,
+  userId: String,
   bids: [bidSchema],
 });
 

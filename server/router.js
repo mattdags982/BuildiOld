@@ -28,6 +28,8 @@ router.post(
 router.post("/bid", projectController.addBid);
 //return all prjects
 router.get("/projects", projectController.returnProjects);
+//return projects specific to a user
+router.get("/userprojects", projectController.returnProjectsById);
 //return specific project for details page
 router.get("/oneProject", projectController.returnOneProject);
 
