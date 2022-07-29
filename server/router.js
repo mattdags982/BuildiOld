@@ -24,9 +24,15 @@ router.post(
   upload.single("projectImage"),
   projectController.postProject
 );
-//add bid to a specific project
+//Bids
 router.post("/bid", projectController.addBid);
-//return all prjects
+router.post("/editbid", projectController.changeBid);
+router.post("/awardbid", projectController.awardBid);
+//RFI's
+router.post("/RFI", projectController.addRFI);
+router.post("/RFIrespond", projectController.respondRFI);
+
+//return all projects
 router.get("/projects", projectController.returnProjects);
 //return projects specific to a user
 router.get("/userprojects", projectController.returnProjectsById);
@@ -36,7 +42,10 @@ router.get("/oneProject", projectController.returnOneProject);
 //auth routes
 router.post("/register", projectController.createUser);
 router.post("/login", projectController.login);
+//auth version for the main user
 router.get("/profile", authMiddleware, projectController.profile);
+//to view someone elses profile
+router.get("/otherprofile", projectController.getOtherProfile);
 router.post("/logout", authMiddleware, projectController.logout);
 
 module.exports = router;

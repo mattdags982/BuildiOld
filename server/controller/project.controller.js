@@ -11,7 +11,9 @@ const postProject = async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       userId: req.body._id,
+      lifeCycle: "open",
       bids: [],
+      rfis: [],
     });
     res.status(202);
     res.send("success!");
@@ -35,8 +37,6 @@ const returnProjects = async (req, res) => {
 const returnProjectsById = async (req, res) => {
   try {
     console.log("param id:", req.query.id);
-    // const projects = await data.Project.find({ userId: req.user._id });
-    // return res.status(200).send(projects);
   } catch (e) {
     console.log(e);
     res.status(505).send(e);
@@ -53,13 +53,108 @@ const returnOneProject = async (req, res) => {
   }
 };
 
+//BIDS
 const addBid = async (req, res) => {
   try {
     const projectToUpdate = await data.Project.findByIdAndUpdate(
       req.body._id,
       {
         $push: {
-          bids: { bidPrice: req.body.bidPrice },
+          bids: {
+            bidPrice: req.body.bidPrice,
+            creatorId: req.body.creatorId,
+            awarded: false,
+          },
+        },
+      },
+      { new: true }
+    );
+    res.status(200).send(projectToUpdate);
+  } catch (e) {
+    console.log(e);
+    res.status(505).send(e);
+  }
+};
+
+const changeBid = async (req, res) => {
+  try {
+    const projectToUpdate = await data.Project.findOneAndUpdate(
+      { _id: req.body._id, "bids.creatorId": req.body.creatorId },
+      {
+        $set: {
+          "bids.$.bidPrice": req.body.bidPrice,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).send(projectToUpdate);
+  } catch (e) {
+    console.log(e);
+    res.status(505).send(e);
+  }
+};
+//will update awarded bid status and also set project life cycle to awarded
+const awardBid = async (req, res) => {
+  console.log("entered");
+  try {
+    let projectToUpdate = await data.Project.findOneAndUpdate(
+      { _id: req.body._id, "bids.creatorId": req.body.creatorId },
+      {
+        $set: {
+          "bids.$.awarded": true,
+        },
+      },
+      { new: true }
+    );
+
+    projectToUpdate = await data.Project.findOneAndUpdate(
+      { _id: req.body._id },
+      {
+        $set: {
+          lifeCycle: "awarded",
+        },
+      },
+      { new: true }
+    );
+    res.status(200).send(projectToUpdate);
+  } catch (e) {
+    console.log(e);
+    res.status(505).send(e);
+  }
+};
+
+//RFIS
+const addRFI = async (req, res) => {
+  console.log(req.body);
+  try {
+    const projectToUpdate = await data.Project.findByIdAndUpdate(
+      req.body._id,
+      {
+        $push: {
+          rfis: {
+            question: req.body.question,
+            response: "",
+            creatorId: req.body.creatorId,
+          },
+        },
+      },
+      { new: true }
+    );
+    res.status(200).send(projectToUpdate);
+  } catch (e) {
+    console.log(e);
+    res.status(505).send(e);
+  }
+};
+
+const respondRFI = async (req, res) => {
+  console.log("got");
+  try {
+    const projectToUpdate = await data.Project.findOneAndUpdate(
+      { _id: req.body._id, "rfis._id": req.body.rfiId },
+      {
+        $set: {
+          "rfis.$.response": req.body.response,
         },
       },
       { new: true }
@@ -110,13 +205,27 @@ const login = async (req, res) => {
       .send({ error: "401", message: "Username or password is incorrect" });
   }
 };
-
+//This version uses auth middleware for logged in user
 const profile = async (req, res) => {
   try {
-    console.log("prof req user", req.user);
     const { _id, firstName, lastName, userType } = req.user;
     const user = { _id, firstName, lastName, userType };
     res.status(200).send(user);
+  } catch (error) {
+    res.status(404).send({ error, message: "User not found" });
+  }
+};
+
+//This version is to obtain profile details of another user, without changing the authorized user (to view someone elses profile)
+//UPDATE LATER SO YOU DO NOT SEND BACK ANY SENSITIVE INFO (IF YOU HAVE TIME)
+const getOtherProfile = async (req, res) => {
+  try {
+    console.log("made it");
+    console.log(req.query.id);
+    const otherUser = await User.findById(req.query.id);
+    // const { _id, firstName, lastName, userType } = req.user;
+    // const user = { _id, firstName, lastName, userType }
+    res.status(200).send(otherUser);
   } catch (error) {
     res.status(404).send({ error, message: "User not found" });
   }
@@ -142,8 +251,13 @@ module.exports = {
   returnProjectsById,
   returnOneProject,
   addBid,
+  changeBid,
+  awardBid,
+  addRFI,
+  respondRFI,
   createUser,
   login,
   profile,
+  getOtherProfile,
   logout,
 };
