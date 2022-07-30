@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 //Creates a new project
 const postProject = async (req, res) => {
   try {
+    console.log(req.body);
     await data.Project.create({
       projectImage: req.file.path,
       name: req.body.name,
@@ -63,6 +64,7 @@ const addBid = async (req, res) => {
           bids: {
             bidPrice: req.body.bidPrice,
             creatorId: req.body.creatorId,
+            creatorName: req.body.creatorName,
             awarded: false,
           },
         },
@@ -166,28 +168,53 @@ const respondRFI = async (req, res) => {
   }
 };
 
+// const createUser = async (req, res) => {
+//   const { email, password } = req.body;
+//   const user = await User.findOne({ email: email });
+//   if (user) {
+//     console.log("user exists =(");
+//     return res
+//       .status(409)
+//       .send({ error: "409", message: "User already exists" });
+//   }
+//   try {
+//     if (password === "") throw new Error();
+//     const hash = await bcrypt.hash(password, 10);
+//     const newUser = new User({
+//       ...req.body,
+//       password: hash,
+//     });
+//     const user = await newUser.save();
+//     req.session.uid = user._id;
+//     res.status(201).send(user);
+//   } catch (e) {
+//     res.status(400).send({ error, message: "Could not create user" });
+//   }
+// };
+
 const createUser = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email: email });
-  if (user) {
-    console.log("user exists =(");
-    return res
-      .status(409)
-      .send({ error: "409", message: "User already exists" });
-  }
-  try {
-    if (password === "") throw new Error();
-    const hash = await bcrypt.hash(password, 10);
-    const newUser = new User({
-      ...req.body,
-      password: hash,
-    });
-    const user = await newUser.save();
-    req.session.uid = user._id;
-    res.status(201).send(user);
-  } catch (e) {
-    res.status(400).send({ error, message: "Could not create user" });
-  }
+  console.log(req.body.name);
+  // const { email, password } = req.body;
+  // const user = await User.findOne({ email: email });
+  // if (user) {
+  //   console.log("user exists =(");
+  //   return res
+  //     .status(409)
+  //     .send({ error: "409", message: "User already exists" });
+  // }
+  // try {
+  //   if (password === "") throw new Error();
+  //   const hash = await bcrypt.hash(password, 10);
+  //   const newUser = new User({
+  //     ...req.body,
+  //     password: hash,
+  //   });
+  //   const user = await newUser.save();
+  //   req.session.uid = user._id;
+  //   res.status(201).send(user);
+  // } catch (e) {
+  //   res.status(400).send({ error, message: "Could not create user" });
+  // }
 };
 
 const login = async (req, res) => {

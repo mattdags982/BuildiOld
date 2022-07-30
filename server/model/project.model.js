@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const bidSchema = new Schema({
   bidPrice: Number,
   creatorId: String,
+  creatorName: String,
   awarded: Boolean,
 });
 
