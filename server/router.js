@@ -40,7 +40,11 @@ router.get("/userprojects", projectController.returnProjectsById);
 router.get("/oneProject", projectController.returnOneProject);
 
 //auth routes
-router.post("/register", projectController.createUser);
+router.post(
+  "/register",
+  upload.single("profilePic"),
+  projectController.createUser
+);
 router.post("/login", projectController.login);
 //auth version for the main user
 router.get("/profile", authMiddleware, projectController.profile);

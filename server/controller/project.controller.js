@@ -97,7 +97,6 @@ const changeBid = async (req, res) => {
 };
 //will update awarded bid status and also set project life cycle to awarded
 const awardBid = async (req, res) => {
-  console.log("entered");
   try {
     let projectToUpdate = await data.Project.findOneAndUpdate(
       { _id: req.body._id, "bids.creatorId": req.body.creatorId },
@@ -127,7 +126,6 @@ const awardBid = async (req, res) => {
 
 //RFIS
 const addRFI = async (req, res) => {
-  console.log(req.body);
   try {
     const projectToUpdate = await data.Project.findByIdAndUpdate(
       req.body._id,
@@ -193,28 +191,32 @@ const respondRFI = async (req, res) => {
 // };
 
 const createUser = async (req, res) => {
-  console.log(req.body.name);
-  // const { email, password } = req.body;
-  // const user = await User.findOne({ email: email });
-  // if (user) {
-  //   console.log("user exists =(");
-  //   return res
-  //     .status(409)
-  //     .send({ error: "409", message: "User already exists" });
-  // }
-  // try {
-  //   if (password === "") throw new Error();
-  //   const hash = await bcrypt.hash(password, 10);
-  //   const newUser = new User({
-  //     ...req.body,
-  //     password: hash,
-  //   });
-  //   const user = await newUser.save();
-  //   req.session.uid = user._id;
-  //   res.status(201).send(user);
-  // } catch (e) {
-  //   res.status(400).send({ error, message: "Could not create user" });
-  // }
+  const { email, password } = req.body;
+  const user = await User.findOne({ email: email });
+  if (user) {
+    console.log("user already exists! Please register as a new user.");
+    return res
+      .status(409)
+      .send({ error: "409", message: "User already exists =(" });
+  }
+  try {
+    if (password === "") throw new Error();
+    const hash = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      ...req.body,
+      profilePic: req.file.path,
+      password: hash,
+    });
+    console.log(newUser);
+    const user = await newUser.save();
+    console.log(user);
+    req.session.uid = user._id;
+    res.status(201).send(user);
+  } catch (error) {
+    res
+      .status(400)
+      .send({ error, message: "Error, could not create a new user =(" });
+  }
 };
 
 const login = async (req, res) => {
@@ -235,8 +237,17 @@ const login = async (req, res) => {
 //This version uses auth middleware for logged in user
 const profile = async (req, res) => {
   try {
-    const { _id, firstName, lastName, userType } = req.user;
-    const user = { _id, firstName, lastName, userType };
+    const { _id, profilePic, firstName, lastName, userType, location, email } =
+      req.user;
+    const user = {
+      _id,
+      profilePic,
+      firstName,
+      lastName,
+      userType,
+      location,
+      email,
+    };
     res.status(200).send(user);
   } catch (error) {
     res.status(404).send({ error, message: "User not found" });
