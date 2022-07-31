@@ -20,6 +20,7 @@ const projectSchema = new Schema({
   name: String,
   description: String,
   userId: String,
+  specialties: [String],
   lifeCycle: String,
   bids: [bidSchema],
   rfis: [RFISchema],

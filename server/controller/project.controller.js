@@ -12,6 +12,7 @@ const postProject = async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       userId: req.body._id,
+      specialties: req.body.specialties.split(","),
       lifeCycle: "open",
       bids: [],
       rfis: [],
