@@ -202,9 +202,12 @@ const createUser = async (req, res) => {
   try {
     if (password === "") throw new Error();
     const hash = await bcrypt.hash(password, 10);
+    let test = req.body.specialties.split(",");
+    console.log(test);
     const newUser = new User({
       ...req.body,
       profilePic: req.file.path,
+      specialties: req.body.specialties.split(","),
       password: hash,
     });
     console.log(newUser);
