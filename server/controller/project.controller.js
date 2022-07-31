@@ -191,6 +191,7 @@ const respondRFI = async (req, res) => {
 // };
 
 const createUser = async (req, res) => {
+  console.log(req.body);
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (user) {
@@ -224,6 +225,7 @@ const createUser = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    console.log(req.body);
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
     const validatedPass = await bcrypt.compare(password, user.password);
@@ -240,8 +242,16 @@ const login = async (req, res) => {
 //This version uses auth middleware for logged in user
 const profile = async (req, res) => {
   try {
-    const { _id, profilePic, firstName, lastName, userType, location, email } =
-      req.user;
+    const {
+      _id,
+      profilePic,
+      firstName,
+      lastName,
+      userType,
+      location,
+      email,
+      specialties,
+    } = req.user;
     const user = {
       _id,
       profilePic,
@@ -250,6 +260,7 @@ const profile = async (req, res) => {
       userType,
       location,
       email,
+      specialties,
     };
     res.status(200).send(user);
   } catch (error) {

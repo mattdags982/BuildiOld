@@ -6,6 +6,7 @@ const express = require("express");
 const cors = require("cors");
 const router = require("./router");
 const session = require("express-session");
+const bodyParser = require("body-parser");
 //Set Up
 const app = new express();
 const corsConfig = {
@@ -19,6 +20,7 @@ app.use(cors(corsConfig));
 
 app.use("/uploads", express.static("uploads"));
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 //session set up
 app.use(
   session({

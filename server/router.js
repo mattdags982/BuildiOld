@@ -45,7 +45,13 @@ router.post(
   upload.single("profilePic"),
   projectController.createUser
 );
-router.post("/login", projectController.login);
+router.post(
+  "/login",
+  upload.single(
+    "formData would not be recieved without this middleware (which is meant for uploadings pictures). This is a temp bandaid fix. Nothing gets uploaded"
+  ),
+  projectController.login
+);
 //auth version for the main user
 router.get("/profile", authMiddleware, projectController.profile);
 //to view someone elses profile
