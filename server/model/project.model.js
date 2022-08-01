@@ -6,6 +6,7 @@ const bidSchema = new Schema({
   bidPrice: Number,
   creatorId: String,
   creatorName: String,
+  creatorPic: String,
   awarded: Boolean,
 });
 

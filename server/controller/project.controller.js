@@ -66,6 +66,7 @@ const addBid = async (req, res) => {
             bidPrice: req.body.bidPrice,
             creatorId: req.body.creatorId,
             creatorName: req.body.creatorName,
+            creatorPic: req.body.creatorPic,
             awarded: false,
           },
         },
@@ -166,30 +167,6 @@ const respondRFI = async (req, res) => {
     res.status(505).send(e);
   }
 };
-
-// const createUser = async (req, res) => {
-//   const { email, password } = req.body;
-//   const user = await User.findOne({ email: email });
-//   if (user) {
-//     console.log("user exists =(");
-//     return res
-//       .status(409)
-//       .send({ error: "409", message: "User already exists" });
-//   }
-//   try {
-//     if (password === "") throw new Error();
-//     const hash = await bcrypt.hash(password, 10);
-//     const newUser = new User({
-//       ...req.body,
-//       password: hash,
-//     });
-//     const user = await newUser.save();
-//     req.session.uid = user._id;
-//     res.status(201).send(user);
-//   } catch (e) {
-//     res.status(400).send({ error, message: "Could not create user" });
-//   }
-// };
 
 const createUser = async (req, res) => {
   console.log(req.body);
