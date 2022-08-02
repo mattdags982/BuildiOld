@@ -99,6 +99,7 @@ const changeBid = async (req, res) => {
 };
 //will update awarded bid status and also set project life cycle to awarded
 const awardBid = async (req, res) => {
+  console.log("here");
   try {
     let projectToUpdate = await data.Project.findOneAndUpdate(
       { _id: req.body._id, "bids.creatorId": req.body.creatorId },
@@ -137,6 +138,7 @@ const addRFI = async (req, res) => {
             question: req.body.question,
             response: "",
             creatorId: req.body.creatorId,
+            creatorPic: req.body.creatorPic,
           },
         },
       },
@@ -168,6 +170,46 @@ const respondRFI = async (req, res) => {
   }
 };
 
+//USER FUNCTIONS
+
+const createReview = async (req, res) => {
+  try {
+    //first leave the review
+    const userToLeaveReviewOn = await User.findByIdAndUpdate(
+      req.body.bidderId,
+      {
+        $push: {
+          reviews: {
+            rating: req.body.rating,
+            review: req.body.review,
+            creatorFirstName: req.body.creatorFirstName,
+            creatorLastName: req.body.creatorLastName,
+            creatorPic: req.body.creatorPic,
+          },
+        },
+      },
+      { new: true }
+    );
+    //next change the project status to closed
+    const projectToClose = await data.Project.findOneAndUpdate(
+      { _id: req.body.projectId },
+      {
+        $set: {
+          lifeCycle: "closed",
+        },
+      },
+      { new: true }
+    );
+
+    console.log(req.body);
+
+    res.status(200).send(userToLeaveReviewOn);
+  } catch (e) {
+    console.log(e);
+    res.status(505).send(e);
+  }
+};
+
 const createUser = async (req, res) => {
   console.log(req.body);
   const { email, password } = req.body;
@@ -181,12 +223,11 @@ const createUser = async (req, res) => {
   try {
     if (password === "") throw new Error();
     const hash = await bcrypt.hash(password, 10);
-    let test = req.body.specialties.split(",");
-    console.log(test);
     const newUser = new User({
       ...req.body,
       profilePic: req.file.path,
       specialties: req.body.specialties.split(","),
+      reviews: [],
       password: hash,
     });
     console.log(newUser);
@@ -229,6 +270,7 @@ const profile = async (req, res) => {
       location,
       email,
       specialties,
+      reviews,
     } = req.user;
     const user = {
       _id,
@@ -239,6 +281,7 @@ const profile = async (req, res) => {
       location,
       email,
       specialties,
+      reviews,
     };
     res.status(200).send(user);
   } catch (error) {
@@ -253,8 +296,6 @@ const getOtherProfile = async (req, res) => {
     console.log("made it");
     console.log(req.query.id);
     const otherUser = await User.findById(req.query.id);
-    // const { _id, firstName, lastName, userType } = req.user;
-    // const user = { _id, firstName, lastName, userType }
     res.status(200).send(otherUser);
   } catch (error) {
     res.status(404).send({ error, message: "User not found" });
@@ -290,4 +331,5 @@ module.exports = {
   profile,
   getOtherProfile,
   logout,
+  createReview,
 };

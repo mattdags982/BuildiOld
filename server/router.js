@@ -38,6 +38,9 @@ router.get("/projects", projectController.returnProjects);
 router.get("/userprojects", projectController.returnProjectsById);
 //return specific project for details page
 router.get("/oneProject", projectController.returnOneProject);
+//USER ROUTES
+//leave review
+router.post("/review", projectController.createReview);
 
 //auth routes
 router.post(

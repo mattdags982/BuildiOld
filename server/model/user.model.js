@@ -2,9 +2,16 @@ const mongoose = require("./index");
 
 const Schema = mongoose.Schema;
 
+const reviewSchema = new Schema({
+  rating: Number,
+  review: String,
+  creatorFirstName: String,
+  creatorLastName: String,
+  creatorPic: String,
+});
+
 const userSchema = mongoose.Schema({
   profilePic: String,
-  // profilePic: { type: String, required: false },
   email: String,
   password: String,
   userType: String,
@@ -12,7 +19,7 @@ const userSchema = mongoose.Schema({
   lastName: String,
   location: String,
   specialties: [String],
+  reviews: [reviewSchema],
 });
 
-//this actually creates the table and names it 'project'
 module.exports = mongoose.model("User", userSchema);

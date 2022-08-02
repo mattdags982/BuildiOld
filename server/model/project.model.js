@@ -14,6 +14,7 @@ const RFISchema = new Schema({
   question: String,
   response: String,
   creatorId: String,
+  creatorPic: String,
 });
 
 const projectSchema = new Schema({
@@ -27,5 +28,4 @@ const projectSchema = new Schema({
   rfis: [RFISchema],
 });
 
-//this actually creates the table and names it 'project'
 module.exports.Project = mongoose.model("project", projectSchema);
